@@ -1,0 +1,7 @@
+#The basic multistrap stuff
+MULTISTRAP armhf raspbian.conf
+# Linaro abe toolchains can't read /etc/ld.so.conf.d
+LDSOFIXUP
+STORE raspbian-sysroot.tgz
+SYMLINK2COPY
+STORE raspbian-sysroot-symfix.tgz

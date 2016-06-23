@@ -1,0 +1,77 @@
+diff --git a/config/gcc.conf b/config/gcc.conf
+index 0497d1e..cd2034a 100644
+--- a/config/gcc.conf
++++ b/config/gcc.conf
+@@ -14,7 +14,7 @@ static_link="no"
+ # This is a list of default flags always supplied to configure
+ default_configure_flags="--with-mpc=${local_builds}/destdir/${host} --with-mpfr=${local_builds}/destdir/${host} --with-gmp=${local_builds}/destdir/${host} --with-gnu-as --with-gnu-ld --disable-libstdcxx-pch --disable-libmudflap${override_arch:+ --with-arch=${override_arch}}${override_cpu:+ --with-cpu=${override_cpu}}${override_tune:+ --with-tune=${override_tune}}"
+ 
+-# --with-as=${local_builds}/bin/${target}-as --with-ld=${local_builds}/bin/${target}-ld 
++# --with-as=${local_builds}/bin/${target}-as --with-ld=${local_builds}/bin/${target}-ld
+ 
+ # Disable the Graphite loop optimizer as it's being depreciated
+ default_configure_flags="${default_configure_flags} --with-cloog=no --with-ppl=no --with-isl=no"
+@@ -37,7 +37,7 @@ default_configure_flags="${default_configure_flags} --enable-c99"
+ # http://gcc.gnu.org/wiki/TransactionalMemory
+ #default_configure_flags="${default_configure_flags} --disable-libitm"
+ 
+-# Libatomic is a synchronization library	     
++# Libatomic is a synchronization library
+ # http://www.hpl.hp.com/research/linux/atomic_ops/
+ #default_configure_flags="${default_configure_flags} --disable-libatomic"
+ 
+@@ -76,21 +76,21 @@ if test x"${build}" != x"${target}"; then
+ 	    ;;
+ 	arm-*linux-gnueabi)
+ 	    if test x"${override_cpu}" = x -a x"${override_tune}" = x; then
+-	        default_configure_flags="${default_configure_flags} --with-tune=cortex-a9"
++	        default_configure_flags="${default_configure_flags} --with-tune=arm1176jz-s"
+ 	    fi
+ 	    if test x"${override_arch}" = x -a x"${override_cpu}" = x; then
+-	        default_configure_flags="${default_configure_flags} --with-arch=armv7-a"
++	        default_configure_flags="${default_configure_flags} --with-arch=armv6"
+ 	    fi
+-	    default_configure_flags="${default_configure_flags} --with-fpu=vfpv3-d16 --with-float=softfp  --with-mode=thumb --disable-multilib --enable-multiarch"
++	    default_configure_flags="${default_configure_flags} --with-fpu=vfp --with-float=softfp  --with-mode=arm --disable-multilib --enable-multiarch"
+ 	    ;;
+ 	arm-*linux-gnueabihf)
+ 	    if test x"${override_cpu}" = x -a x"${override_tune}" = x; then
+-	        default_configure_flags="${default_configure_flags} --with-tune=cortex-a9"
++	        default_configure_flags="${default_configure_flags} --with-tune=arm1176jz-s"
+ 	    fi
+ 	    if test x"${override_arch}" = x -a x"${override_cpu}" = x; then
+-	        default_configure_flags="${default_configure_flags} --with-arch=armv7-a"
++	        default_configure_flags="${default_configure_flags} --with-arch=armv6"
+ 	    fi
+-	    default_configure_flags="${default_configure_flags} --with-fpu=vfpv3-d16 --with-float=hard --with-mode=thumb --disable-multilib --enable-multiarch"
++	    default_configure_flags="${default_configure_flags} --with-fpu=vfp --with-float=hard --with-mode=arm --disable-multilib --enable-multiarch"
+ 	    ;;
+ 	armeb-*linux-gnueabi)
+ 	    if test x"${override_cpu}" = x -a x"${override_tune}" = x; then
+@@ -143,7 +143,7 @@ if test x"${build}" != x"${target}"; then
+ 	    default_configure_flags="${default_configure_flags}"
+ 	    ;;
+     esac
+-   
++
+     case ${clibrary} in
+ 	eglibc)
+ 	    if test "`echo ${eglibc_version} | grep -c '/'`" -gt 0; then
+@@ -178,7 +178,7 @@ if test x"${build}" != x"${target}"; then
+ 	local sysroot="${local_builds}/sysroot-${target}"
+     fi
+    stage2_flags="--with-build-sysroot=${sysroots} --enable-lto --enable-linker-build-id --enable-long-long --enable-shared --with-sysroot=${sysroot} --enable-languages=${languages}"
+-    
++
+     if test x"${release}" = x; then
+         stage2_flags="${stage2_flags} --enable-checking=yes"
+     else
+@@ -235,7 +235,7 @@ else
+ 	    ;;
+     esac
+   	stage2_flags=""
+-fi	 
++fi
+ 
+ # This is a list of default flags always supplied to "make check".
+ runtest_flags=""
