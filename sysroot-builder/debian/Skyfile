@@ -2,6 +2,6 @@
 MULTISTRAP armel debian.conf
 # Linaro abe toolchains can't read /etc/ld.so.conf.d
 LDSOFIXUP
-STORE debian-sysroot.tgz
+STORE sysroot.tgz
 SYMLINK2COPY
-STORE debian-sysroot-symfix.tgz
+STORE sysroot-symfix.tgz

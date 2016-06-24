@@ -1,41 +1,52 @@
-http_proxy=http://shadowblade:3128
-export http_proxy
-https_proxy=http://shadowblade:3128
-export https_proxy
+#http_proxy=http://shadowblade:3128
+#export http_proxy
+#https_proxy=http://shadowblade:3128
+#export https_proxy
 
 DATE=$(shell date +%d%m%Y)
 ROOT=$(shell pwd)
 
-SYSROOT=rapsbian
+SKYFORGE=$(ROOT)/skyforge/skyforge
+
+
+SYSROOT?=raspbian
 ifeq ($(SYSROOT),raspbian)
-	TARGET_TRIPLET=arm-rcm-linux-gnueabihf
+ TARGET_TRIPLET=arm-rcm-linux-gnueabihf
 else
-	TARGET_TRIPLET=arm-rcm-linux-gnueabi
+ TARGET_TRIPLET=arm-rcm-linux-gnueabi
 endif
+
+PATH:=$(ROOT)/build-linux/builds/destdir/x86_64-unknown-linux-gnu/bin:$(PATH)
+export PATH
 
 all: output/linux/$(TARGET_TRIPLET)-$(DATE).tgz output/windows/$(TARGET_TRIPLET)-$(DATE).tgz
 
-output/linux/$(TARGET_TRIPLET)-$(DATE).tgz: build-mingw32/.symlinkfix
+output/linux/$(TARGET_TRIPLET)-$(DATE).tgz: build-mingw32/.sysroot
 		mkdir -p output/linux/
-		cp build-linux/snapshots/gcc-linaro-*.tar.xz $(@)
+		cd build-linux/builds/destdir/ && \
+			mv x86_64-unknown-linux-gnu $(TARGET_TRIPLET); \
+			tar cvpzf ../../../$(@) . ;\
+			mv $(TARGET_TRIPLET) x86_64-unknown-linux-gnu
 
-output/windows/$(TARGET_TRIPLET)-$(DATE).tgz: build-mingw32/.symlinkfix
+output/windows/$(TARGET_TRIPLET)-$(DATE).tgz: build-linux/.sysroot
 		mkdir -p output/windows/
 		cd build-mingw32/builds/destdir/ && \
-			tar cvpzf ../../../$(@) .
+			mv i686-w64-mingw32 $(TARGET_TRIPLET) && \
+			tar cvpzf ../../../$(@) . && \
+			mv $(TARGET_TRIPLET) i686-w64-mingw32
 
-build-linux/.sysroot:
-	cd sysroot-builder/$(SYSROOT) && sudo skyforge build
+build-linux/.sysroot: skyforge
+	cd sysroot-builder/$(SYSROOT) && sudo $(SKYFORGE) build
 	mkdir -p build-linux/builds/destdir/x86_64-unknown-linux-gnu/$(TARGET_TRIPLET)/libc
-	tar vxpf sysroot-builder/$(SYSROOT)/debian-sysroot.tgz -C \
+	tar vxpf sysroot-builder/$(SYSROOT)/sysroot.tgz -C \
 		build-linux/builds/destdir/x86_64-unknown-linux-gnu/$(TARGET_TRIPLET)/libc
 	touch $@
 
-build-mingw32/.sysroot:
-	cd sysroot-builder/$(SYSROOT) && sudo skyforge build
+build-mingw32/.sysroot: skyforge
+	cd sysroot-builder/$(SYSROOT) && sudo $(SKYFORGE) build
 	mkdir -p build-mingw32/builds/destdir/i686-w64-mingw32/$(TARGET_TRIPLET)/libc
-	tar vxpf sysroot-builder/$(SYSROOT)/debian-sysroot-symfix.tgz -C \
-		build-linux/builds/destdir/i686-w64-mingw32/$(TARGET_TRIPLET)/libc
+	tar vxpf sysroot-builder/$(SYSROOT)/sysroot-symfix.tgz -C \
+		build-mingw32/builds/destdir/i686-w64-mingw32/$(TARGET_TRIPLET)/libc
 	touch $@
 
 build-mingw32/.symlinkfix: build-mingw32/.built
@@ -44,8 +55,7 @@ build-mingw32/.symlinkfix: build-mingw32/.built
 	touch $(@)
 
 build-mingw32/.built: build-linux/.built
-	mkdir build-mingw32
-	export PATH=`pwd`/build-linux/builds/destdir/x86_64-unknown-linux-gnu/bin:$$PATH
+	mkdir -p build-mingw32
 	cd build-mingw32 && ../abe/configure && \
 		../abe/abe.sh --timeout 60 --target $(TARGET_TRIPLET) --host i686-w64-mingw32 --build all
 	touch $@
@@ -59,6 +69,9 @@ build-linux/.built: abe/.patched
 abe:
 	git clone https://git.linaro.org/toolchain/abe.git
 	cd abe && git checkout stable
+
+skyforge:
+	git clone https://github.com/RC-MODULE/skyforge.git
 
 abe/.patched: abe
 	cd abe && \

@@ -1,3 +1,4 @@
+#!/bin/bash
   for link in `find . -type l`; do
     dir=$(dirname "$link")
     reltarget=$(readlink "$link")
