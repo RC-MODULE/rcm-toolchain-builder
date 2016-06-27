@@ -7,6 +7,7 @@ DATE=$(shell date +%d%m%Y)
 ROOT=$(shell pwd)
 
 SYSROOT?=raspbian
+NEED_ARMV6_PATCH?=y
 ifeq ($(SYSROOT),raspbian)
  TARGET_TRIPLET=arm-rcm-linux-gnueabihf
 else
@@ -74,10 +75,15 @@ abe:
 skyforge:
 	git clone https://github.com/RC-MODULE/skyforge.git
 
+
 abe/.patched: abe
 	cd abe && \
 		git reset --hard HEAD && \
+ifeq($(NEED_ARMV6_PATCH),y)
 		patch -p1 < ../gcc.conf.patch
+else
+		echo "No need to patch"
+endif
 	touch $@
 
 clean:
