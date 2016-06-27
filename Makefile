@@ -25,11 +25,11 @@ endif
 PATH:=$(ROOT)/build-linux/builds/destdir/x86_64-unknown-linux-gnu/bin:$(ROOT)/skyforge:$(PATH)
 export PATH
 
-all: output/linux/$(TARGET_TRIPLET)-$(DATE).tgz output/windows/$(TARGET_TRIPLET)-$(DATE).tgz
+all: linux win32
 
 linux: output/linux/$(TARGET_TRIPLET)-$(DATE).tgz
 
-win32: output/windows/$(TARGET_TRIPLET)-$(DATE).tgz
+win32: output/windows/$(TARGET_TRIPLET)-$(DATE).zip
 
 output/linux/$(TARGET_TRIPLET)-$(DATE).tgz: build-linux/.sysroot
 		mkdir -p output/linux/
@@ -38,11 +38,11 @@ output/linux/$(TARGET_TRIPLET)-$(DATE).tgz: build-linux/.sysroot
 			tar cpzf ../../../$(@) . ;\
 			mv $(TARGET_TRIPLET) x86_64-unknown-linux-gnu
 
-output/windows/$(TARGET_TRIPLET)-$(DATE).tgz: build-mingw32/.sysroot
+output/windows/$(TARGET_TRIPLET)-$(DATE).zip: build-mingw32/.sysroot
 		mkdir -p output/windows/
 		cd build-mingw32/builds/destdir/ && \
 			mv i686-w64-mingw32 $(TARGET_TRIPLET) && \
-			tar cpzf ../../../$(@) . && \
+			zip -r ../../../$(@) . && \
 			mv $(TARGET_TRIPLET) i686-w64-mingw32
 
 build-linux/.sysroot: skyforge build-linux/.built
