@@ -7,11 +7,19 @@ DATE=$(shell date +%d%m%Y)
 ROOT=$(shell pwd)
 
 SYSROOT?=raspbian
-NEED_ARMV6_PATCH?=y
 ifeq ($(SYSROOT),raspbian)
  TARGET_TRIPLET=arm-rcm-linux-gnueabihf
-else
+ NEED_ARMV6_PATCH=y
+endif
+
+ifeq ($(SYSROOT),debian-armel)
  TARGET_TRIPLET=arm-rcm-linux-gnueabi
+ NEED_ARMV6_PATCH=y
+endif
+
+ifeq ($(SYSROOT),debian-armhf)
+ TARGET_TRIPLET=arm-rcm-linux-gnueabi
+ NEED_ARMV6_PATCH=n
 endif
 
 PATH:=$(ROOT)/build-linux/builds/destdir/x86_64-unknown-linux-gnu/bin:$(ROOT)/skyforge:$(PATH)
@@ -76,15 +84,21 @@ skyforge:
 	git clone https://github.com/RC-MODULE/skyforge.git
 
 
+ifeq ($(NEED_ARMV6_PATCH),y)
 abe/.patched: abe
 	cd abe && \
 		git reset --hard HEAD && \
-ifeq($(NEED_ARMV6_PATCH),y)
 		patch -p1 < ../gcc.conf.patch
-else
-		echo "No need to patch"
-endif
 	touch $@
+
+else
+abe/.patched: abe
+	cd abe && \
+		git reset --hard HEAD && \
+		echo "No need to patch"
+	touch $@
+endif
+
 
 clean:
 	rm -Rfv build-*
