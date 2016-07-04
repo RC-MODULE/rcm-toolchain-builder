@@ -6,23 +6,26 @@
 DATE=$(shell date +%d%m%Y)
 ROOT=$(shell pwd)
 
+VENDOR?=rcm
 SYSROOT?=raspbian
+
 ifeq ($(SYSROOT),raspbian)
- TARGET_TRIPLET=arm-rcm-linux-gnueabihf
+ TARGET_TRIPLET=arm-$(VENDOR)-linux-gnueabihf
  NEED_ARMV6_PATCH=y
 endif
 
 ifeq ($(SYSROOT),debian-armel)
- TARGET_TRIPLET=arm-rcm-linux-gnueabi
+ TARGET_TRIPLET=arm-$(VENDOR)-linux-gnueabi
  NEED_ARMV6_PATCH=y
 endif
 
 ifeq ($(SYSROOT),debian-armhf)
- TARGET_TRIPLET=arm-rcm-linux-gnueabi
+ TARGET_TRIPLET=arm-$(VENDOR)-linux-gnueabihf
  NEED_ARMV6_PATCH=n
 endif
 
-PATH:=$(ROOT)/build-linux/builds/destdir/x86_64-unknown-linux-gnu/bin:$(ROOT)/skyforge:$(PATH)
+SKYFORGE:=$(ROOT)/skyforge/skyforge
+PATH:=$(ROOT)/build-linux/builds/destdir/x86_64-unknown-linux-gnu/bin:$(PATH)
 export PATH
 
 all: linux win32
@@ -46,14 +49,14 @@ output/windows/$(TARGET_TRIPLET)-$(DATE).zip: build-mingw32/.sysroot
 			mv $(TARGET_TRIPLET) i686-w64-mingw32
 
 build-linux/.sysroot: skyforge build-linux/.built
-	cd sysroot-builder/$(SYSROOT) && sudo skyforge build
+	cd sysroot-builder/$(SYSROOT) && sudo $(SKYFORGE) build
 	mkdir -p build-linux/builds/destdir/x86_64-unknown-linux-gnu/$(TARGET_TRIPLET)/libc
 	tar xpf sysroot-builder/$(SYSROOT)/sysroot.tgz -C \
 		build-linux/builds/destdir/x86_64-unknown-linux-gnu/$(TARGET_TRIPLET)/libc
 	touch $@
 
 build-mingw32/.sysroot: skyforge build-mingw32/.built
-	cd sysroot-builder/$(SYSROOT) && sudo skyforge build
+	cd sysroot-builder/$(SYSROOT) && sudo $(SKYFORGE) build
 	mkdir -p build-mingw32/builds/destdir/i686-w64-mingw32/$(TARGET_TRIPLET)/libc
 	tar xpf sysroot-builder/$(SYSROOT)/sysroot-symfix.tgz -C \
 		build-mingw32/builds/destdir/i686-w64-mingw32/$(TARGET_TRIPLET)/libc
