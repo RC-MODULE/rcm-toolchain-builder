@@ -1,5 +1,5 @@
 #The basic multistrap stuff
-MULTISTRAP armhf raspbian.conf
+MULTISTRAP $DEBARCH raspbian.conf
 # Linaro abe toolchains can't read /etc/ld.so.conf.d
 LDSOFIXUP
 SYMLINK2RELATIVE
