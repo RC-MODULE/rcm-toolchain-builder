@@ -2,12 +2,20 @@
 #export http_proxy
 #https_proxy=http://shadowblade:3128
 #export https_proxy
-
+#
 DATE=$(shell date +%d%m%Y)
 ROOT=$(shell pwd)
 
 VENDOR?=rcm
 SYSROOT?=raspbian
+
+COMPONENT_VERSIONS:= \
+	gcc=gcc-linaro-5.2-2015.11-2 \
+	binutils=binutils-gdb.git@ef90a4718f535cbe6345b4e7168baea7b1972abf \
+	dejagnu=dejagnu.git/linaro \
+	glibc=glibc.git~release/2.21/master
+
+ABE_OP?=--tarbin --build all $(COMPONENT_VERSIONS)
 
 ifeq ($(SYSROOT),raspbian)
  TARGET_TRIPLET=arm-$(VENDOR)-linux-gnueabihf
@@ -77,13 +85,13 @@ build-mingw32/.symlinkfix: build-mingw32/.built
 build-mingw32/.built: build-linux/.built
 	mkdir -p build-mingw32
 	cd build-mingw32 && ../abe/configure && \
-		../abe/abe.sh --timeout 60 --target $(TARGET_TRIPLET) --host i686-w64-mingw32 --tarbin --build all
+		../abe/abe.sh --timeout 60 --target $(TARGET_TRIPLET) --host i686-w64-mingw32 $(ABE_OP)
 	touch $@
 
 build-linux/.built: abe/.patched
 	mkdir build-linux
 	cd build-linux && ../abe/configure && \
-		../abe/abe.sh --timeout 60 --target $(TARGET_TRIPLET) --tarbin --build all
+		../abe/abe.sh --timeout 60 --target $(TARGET_TRIPLET) $(ABE_OP)
 	touch $@
 
 abe:
