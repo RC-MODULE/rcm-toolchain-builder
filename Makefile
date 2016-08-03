@@ -1,8 +1,8 @@
-#http_proxy=http://shadowblade:3128
-#export http_proxy
-#https_proxy=http://shadowblade:3128
-#export https_proxy
-#
+http_proxy=http://shadowblade:3128
+export http_proxy
+https_proxy=http://shadowblade:3128
+export https_proxy
+
 DATE=$(shell date +%d%m%Y)
 ROOT=$(shell pwd)
 
@@ -10,12 +10,12 @@ VENDOR?=rcm
 SYSROOT?=raspbian
 
 COMPONENT_VERSIONS:= \
-	gcc=gcc-linaro-5.2-2015.11-2 \
-	binutils=binutils-gdb.git@ef90a4718f535cbe6345b4e7168baea7b1972abf \
+	gcc=gcc-linaro-5.3-2016.02.tar.xz \
+	binutils=binutils-linaro-2.25.0-2015.01-2.tar.xz \
 	dejagnu=dejagnu.git/linaro \
-	glibc=glibc.git~release/2.21/master
+	glibc=glibc-linaro-2.20-2014.11.tar.xz 
 
-ABE_OP?=--tarbin --build all $(COMPONENT_VERSIONS)
+ABE_OP?=$(COMPONENT_VERSIONS) --tarbin --build all 
 
 ifeq ($(SYSROOT),raspbian)
  TARGET_TRIPLET=arm-$(VENDOR)-linux-gnueabihf
@@ -89,7 +89,7 @@ build-mingw32/.built: build-linux/.built
 	touch $@
 
 build-linux/.built: abe/.patched
-	mkdir build-linux
+	mkdir -p build-linux
 	cd build-linux && ../abe/configure && \
 		../abe/abe.sh --timeout 60 --target $(TARGET_TRIPLET) $(ABE_OP)
 	touch $@
@@ -102,21 +102,16 @@ skyforge:
 	git clone https://github.com/RC-MODULE/skyforge.git
 
 
-ifeq ($(NEED_ARMV6_PATCH),y)
 abe/.patched: abe
 	cd abe && \
-		git reset --hard HEAD && \
-		patch -p1 < ../gcc.conf.patch
-	touch $@
+	git reset --hard HEAD && \
+	echo "glibc       http://148.251.136.42/snapshots-ref" >> config/sources.conf
 
-else
-abe/.patched: abe
-	cd abe && \
-		git reset --hard HEAD && \
-		echo "No need to patch"
-	touch $@
+ifeq ($(NEED_ARMV6_PATCH),y)
+	cd abe && patch -p1 < ../gcc.conf.patch
 endif
 
+	touch $@
 
 clean:
 	rm -Rfv build-*
