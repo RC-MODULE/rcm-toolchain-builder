@@ -10,12 +10,12 @@ VENDOR?=rcm
 SYSROOT?=raspbian
 
 COMPONENT_VERSIONS:= \
-	gcc=gcc-linaro-5.3-2016.02.tar.xz \
-	binutils=binutils-linaro-2.25.0-2015.01-2.tar.xz \
+	gcc=gcc-linaro-4.9-2016.02.tar.xz \
+	binutils=binutils-linaro-2.24.0-2014.11-2.tar.xz \
 	dejagnu=dejagnu.git/linaro \
-	glibc=glibc-linaro-2.20-2014.11.tar.xz 
+	glibc=glibc-linaro-2.20-2014.11.tar.xz
 
-ABE_OP?=$(COMPONENT_VERSIONS) --tarbin --build all 
+ABE_OP?=$(COMPONENT_VERSIONS) --tarbin --build all
 
 ifeq ($(SYSROOT),raspbian)
  TARGET_TRIPLET=arm-$(VENDOR)-linux-gnueabihf
@@ -40,6 +40,9 @@ endif
 
 SKYFORGE:=$(ROOT)/skyforge/skyforge
 PATH:=$(ROOT)/build-linux/builds/destdir/x86_64-unknown-linux-gnu/bin:$(PATH)
+SNAPSHOTS_DIR:=--snapshots $(shell pwd)/snapshots
+#SNAPSHOTS_DIR:=
+
 export PATH
 export DEBARCH
 
@@ -85,13 +88,13 @@ build-mingw32/.symlinkfix: build-mingw32/.built
 build-mingw32/.built: build-linux/.built
 	mkdir -p build-mingw32
 	cd build-mingw32 && ../abe/configure && \
-		../abe/abe.sh --timeout 60 --target $(TARGET_TRIPLET) --host i686-w64-mingw32 $(ABE_OP)
+		../abe/abe.sh $(SNAPSHOTS_DIR) --timeout 60 --target $(TARGET_TRIPLET) --host i686-w64-mingw32 $(ABE_OP)
 	touch $@
 
 build-linux/.built: abe/.patched
 	mkdir -p build-linux
 	cd build-linux && ../abe/configure && \
-		../abe/abe.sh --timeout 60 --target $(TARGET_TRIPLET) $(ABE_OP)
+		../abe/abe.sh $(SNAPSHOTS_DIR) --timeout 60 --target $(TARGET_TRIPLET) $(ABE_OP)
 	touch $@
 
 abe:
@@ -105,7 +108,9 @@ skyforge:
 abe/.patched: abe
 	cd abe && \
 	git reset --hard HEAD && \
-	echo "glibc       http://148.251.136.42/snapshots-ref" >> config/sources.conf
+	echo "glibc       http://148.251.136.42/snapshots-ref" >> config/sources.conf && \
+	patch -p1 < ../abe-gcc-4.9-missing.stub.patch
+
 
 ifeq ($(NEED_ARMV6_PATCH),y)
 	cd abe && patch -p1 < ../gcc.conf.patch

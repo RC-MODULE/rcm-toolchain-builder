@@ -1,0 +1,82 @@
+diff --git a/lib/configure.sh b/lib/configure.sh
+index 67b0c22..90c1f49 100755
+--- a/lib/configure.sh
++++ b/lib/configure.sh
+@@ -1,12 +1,12 @@
+ #!/bin/bash
+-# 
++#
+ #   Copyright (C) 2013, 2014, 2015, 2016 Linaro, Inc
+-# 
++#
+ # This program is free software; you can redistribute it and/or modify
+ # it under the terms of the GNU General Public License as published by
+ # the Free Software Foundation; either version 3 of the License, or
+ # (at your option) any later version.
+-# 
++#
+ # This program is distributed in the hope that it will be useful,
+ # but WITHOUT ANY WARRANTY; without even the implied warranty of
+ # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+@@ -14,7 +14,18 @@
+ # You should have received a copy of the GNU General Public License
+ # along with this program; if not, write to the Free Software
+ # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+-# 
++#
++
++missing_stub()
++{
++    cat <<EOF
++#!/bin/bash
++APP=\$1
++shift
++\$APP \$*
++EOF
++
++}
+ 
+ # Configure a source directory
+ # $1 - the directory to configure
+@@ -43,7 +54,7 @@ configure_build()
+     check_stamp "${stampdir}" ${stamp} ${srcdir} configure ${force}
+     ret=$?
+     if test $ret -eq 0; then
+-	return 0 
++	return 0
+     elif test $ret -eq 255; then
+ 	# This means that the compare file ${srcdir} is not present.
+ 	return 1
+@@ -73,7 +84,7 @@ configure_build()
+     else
+ 	local toolname="${component}"
+     fi
+-  
++
+     local opts="`get_component_configure ${component} $2`"
+ 
+     # See if this component depends on other components. They then need to be
+@@ -141,6 +152,10 @@ configure_build()
+ 	    dryrun "(mkdir -p ${sysroots}/usr/lib)"
+ 	    ;;
+ 	gcc*)
++        #Hack: gcc-4.9.x has a bug in 'missing' script
++        missing_stub > ${srcdir}/missing
++        chmod +x ${srcdir}/missing
++
+ 	    if test x"${build}" != x"${target}"; then
+ 		if test x"$2" != x; then
+ 		    case $2 in
+@@ -213,6 +228,7 @@ configure_build()
+ 	if test x"${CONFIG_SHELL}" = x; then
+ 	    export CONFIG_SHELL=${bash_shell}
+ 	fi
++
+ 	dryrun "(cd ${builddir} && ${CONFIG_SHELL} ${srcdir}/configure SHELL=${bash_shell} ${default_configure_flags} ${opts})"
+ 	if test $? -gt 0; then
+ 	    error "Configure of $1 failed."
+@@ -232,4 +248,3 @@ configure_build()
+ 
+     return 0
+ }
+-
