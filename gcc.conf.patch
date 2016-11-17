@@ -75,3 +75,35 @@ index 0497d1e..cd2034a 100644
  
  # This is a list of default flags always supplied to "make check".
  runtest_flags=""
+diff --git a/config/gcc.conf b/config/gcc.conf
+index c176080..b059db5 100644
+--- a/config/gcc.conf
++++ b/config/gcc.conf
+@@ -97,21 +97,21 @@ if test x"${build}" != x"${target}"; then
+ 	    ;;
+ 	arm-*linux-gnueabi)
+ 	    if test x"${override_cpu}" = x -a x"${override_tune}" = x; then
+-	        default_configure_flags="${default_configure_flags} --with-tune=cortex-a9"
++	        default_configure_flags="${default_configure_flags} --with-tune=arm1176jz-s"
+ 	    fi
+ 	    if test x"${override_arch}" = x -a x"${override_cpu}" = x; then
+-	        default_configure_flags="${default_configure_flags} --with-arch=armv7-a"
++	        default_configure_flags="${default_configure_flags} --with-arch=armv6"
+ 	    fi
+-	    default_configure_flags="${default_configure_flags} --with-fpu=vfpv3-d16 --with-float=softfp  --with-mode=thumb --enable-multiarch"
++	    default_configure_flags="${default_configure_flags} --with-fpu=vfp --with-float=softfp  --with-mode=thumb --enable-multiarch"
+ 	    ;;
+ 	arm-*linux-gnueabihf)
+ 	    if test x"${override_cpu}" = x -a x"${override_tune}" = x; then
+-	        default_configure_flags="${default_configure_flags} --with-tune=cortex-a9"
++	        default_configure_flags="${default_configure_flags} --with-tune=arm1176jz-s"
+ 	    fi
+ 	    if test x"${override_arch}" = x -a x"${override_cpu}" = x; then
+-	        default_configure_flags="${default_configure_flags} --with-arch=armv7-a"
++	        default_configure_flags="${default_configure_flags} --with-arch=armv6"
+ 	    fi
+-	    default_configure_flags="${default_configure_flags} --with-fpu=vfpv3-d16 --with-float=hard --with-mode=thumb --enable-multiarch"
++	    default_configure_flags="${default_configure_flags} --with-fpu=vfp --with-float=hard --with-mode=thumb --enable-multiarch"
+ 	    ;;
+ 	armeb-*linux-gnueabi)
+ 	    if test x"${override_cpu}" = x -a x"${override_tune}" = x; then
