@@ -98,8 +98,9 @@ build-linux/.built: abe/.patched
 	touch $@
 
 abe:
+	#	cd abe && git checkout stable
 	git clone https://git.linaro.org/toolchain/abe.git
-	cd abe && git checkout stable
+	cd abe && git checkout 833c70ba2b05ee6312c15f34b7662d371bac310f
 
 skyforge:
 	git clone https://github.com/RC-MODULE/skyforge.git
