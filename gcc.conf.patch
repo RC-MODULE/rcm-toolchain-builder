@@ -14,7 +14,7 @@ index c176080..b059db5 100644
 +	        default_configure_flags="${default_configure_flags} --with-arch=armv6"
  	    fi
 -	    default_configure_flags="${default_configure_flags} --with-fpu=vfpv3-d16 --with-float=softfp  --with-mode=thumb --enable-multiarch"
-+	    default_configure_flags="${default_configure_flags} --with-fpu=vfp --with-float=softfp  --with-mode=thumb --enable-multiarch"
++	    default_configure_flags="${default_configure_flags} --with-fpu=vfp --with-float=softfp  --with-mode=arm --enable-multiarch"
  	    ;;
  	arm-*linux-gnueabihf)
  	    if test x"${override_cpu}" = x -a x"${override_tune}" = x; then
@@ -26,7 +26,7 @@ index c176080..b059db5 100644
 +	        default_configure_flags="${default_configure_flags} --with-arch=armv6"
  	    fi
 -	    default_configure_flags="${default_configure_flags} --with-fpu=vfpv3-d16 --with-float=hard --with-mode=thumb --enable-multiarch"
-+	    default_configure_flags="${default_configure_flags} --with-fpu=vfp --with-float=hard --with-mode=thumb --enable-multiarch"
++	    default_configure_flags="${default_configure_flags} --with-fpu=vfp --with-float=hard --with-mode=arm --enable-multiarch"
  	    ;;
  	armeb-*linux-gnueabi)
  	    if test x"${override_cpu}" = x -a x"${override_tune}" = x; then
